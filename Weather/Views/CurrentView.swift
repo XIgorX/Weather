@@ -9,6 +9,8 @@ import UIKit
 
 class CurrentView: UIView {
     
+    let topLabel = UILabel()
+    
     // Инициализатор для программного создания
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -18,7 +20,6 @@ class CurrentView: UIView {
     // Инициализатор для создания из Storyboard/Xib
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        setupView()
     }
     
     // Настройка внешнего вида
@@ -29,7 +30,6 @@ class CurrentView: UIView {
         // Добавьте сюда другие элементы (label, image и т.д.)
         
         // Верхний лейбл
-        let topLabel = UILabel()
         topLabel.text = "Заголовок"
         topLabel.numberOfLines = 0
         topLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -100,6 +100,22 @@ class CurrentView: UIView {
             bottomLabel2.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -16),
             bottomLabel2.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -16) // Отступ от низа
         ])
+        
+        //changeText(newText: "It works!")
 
+    }
+    
+    func changeText(newText: String) {
+        
+//        DispatchQueue.main.async {
+//                print("Обновление в главном потоке")
+                self.topLabel.text = newText
+//                print("Текст установлен: \(self.topLabel.text ?? "nil")")
+//            }
+        
+//        DispatchQueue.main.async {
+//            self.topLabel.text = newText
+//            self.layoutSubviews()
+//        }
     }
 }
