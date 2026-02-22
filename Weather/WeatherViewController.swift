@@ -18,6 +18,7 @@ class WeatherViewController: UIViewController {
     private var coordinateLabel = UILabel()
     
     private let locationManager = CLLocationManager()
+    private let weatherService = WeatherService()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -69,12 +70,27 @@ class WeatherViewController: UIViewController {
 extension WeatherViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
+            self.updateUI(with: location)
+            
             locationManager.stopUpdatingLocation()
             //let lat = location.coordinate.latitude
             //let lon = location.coordinate.longitude
-            //weatherManager.fetchWeather(latitude: lat, longitude: lon)
-            self.updateUI(with: location)
+            weatherService.fetchCurrentWeather(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude) { [weak self] result in
+                    DispatchQueue.main.async {
+                        switch result {
+                        case .success(let weather):
+                            self?.displayWeather(weather)
+                        case .failure(let error):
+                            self?.showError(error.errorDescription ?? "Произошла ошибка")
+                        }
+                    }
+                }
         }
+    }
+    
+    private func displayWeather(_ weather: WeatherResponse) {
+        // Здесь будет логика отображения данных на UI
+        print(weather)
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {

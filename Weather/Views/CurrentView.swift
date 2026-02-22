@@ -10,6 +10,10 @@ import UIKit
 class CurrentView: UIView {
     
     let topLabel = UILabel()
+    let imageView = UIImageView()
+    let rightLabel = UILabel()
+    let bottomLabel1 = UILabel()
+    let bottomLabel2 = UILabel()
     
     // Инициализатор для программного создания
     override init(frame: CGRect) {
@@ -36,27 +40,23 @@ class CurrentView: UIView {
         topLabel.textAlignment = .center
 
         // Изображение слева
-        let imageView = UIImageView()
         imageView.image = UIImage(named: "example")
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
 
         // Правый лейбл
-        let rightLabel = UILabel()
         rightLabel.text = "Текст справа от картинки"
         rightLabel.numberOfLines = 0
         rightLabel.translatesAutoresizingMaskIntoConstraints = false
         rightLabel.textAlignment = .center
 
         // Нижний лейбл 1
-        let bottomLabel1 = UILabel()
         bottomLabel1.text = "Первый нижний текст"
         bottomLabel1.numberOfLines = 0
         bottomLabel1.translatesAutoresizingMaskIntoConstraints = false
         bottomLabel1.textAlignment = .center
 
         // Нижний лейбл 2
-        let bottomLabel2 = UILabel()
         bottomLabel2.text = "Второй нижний текст"
         bottomLabel2.numberOfLines = 0
         bottomLabel2.translatesAutoresizingMaskIntoConstraints = false
@@ -112,10 +112,5 @@ class CurrentView: UIView {
                 self.topLabel.text = newText
 //                print("Текст установлен: \(self.topLabel.text ?? "nil")")
 //            }
-        
-//        DispatchQueue.main.async {
-//            self.topLabel.text = newText
-//            self.layoutSubviews()
-//        }
     }
 }

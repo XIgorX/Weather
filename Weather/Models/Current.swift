@@ -16,7 +16,7 @@ struct Current: Codable {
     var last_updated: String
     var temp_c: Float
     var temp_f: Float
-    var is_day: Bool
+    var is_day: Int
     var condition: Condition
     var wind_mph: Float
     var wind_kph: Float
