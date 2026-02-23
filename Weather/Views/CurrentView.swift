@@ -31,8 +31,6 @@ class CurrentView: UIView {
         backgroundColor = .systemBlue
         //layer.cornerRadius = 10
         
-        // Добавьте сюда другие элементы (label, image и т.д.)
-        
         // Верхний лейбл
         topLabel.text = "Заголовок"
         topLabel.numberOfLines = 0
@@ -43,6 +41,7 @@ class CurrentView: UIView {
         imageView.image = UIImage(named: "example")
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.backgroundColor = .red
 
         // Правый лейбл
         rightLabel.text = "Текст справа от картинки"
@@ -100,8 +99,6 @@ class CurrentView: UIView {
             bottomLabel2.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -16),
             bottomLabel2.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -16) // Отступ от низа
         ])
-        
-        //changeText(newText: "It works!")
 
     }
     

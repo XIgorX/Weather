@@ -26,7 +26,6 @@ class WeatherViewController: UIViewController {
         view.backgroundColor = .systemGreen
         currentView = CurrentView(frame: CGRect(x: 0, y: yOffset, width: Int(view.frame.width), height: currentViewHeight))
 //        currentView.translatesAutoresizingMaskIntoConstraints = false
-//        currentView.backgroundColor = .systemGreen
 
         view.addSubview(currentView)
 
@@ -54,7 +53,6 @@ class WeatherViewController: UIViewController {
     
     private func updateUI(with location: CLLocation) {
         let coordinates = "Широта: \(location.coordinate.latitude), Долгота: \(location.coordinate.longitude)"
-        self.currentView.changeText(newText: coordinates)
         self.coordinateLabel.text = coordinates
     }
     
@@ -62,6 +60,29 @@ class WeatherViewController: UIViewController {
         let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
+    }
+    
+    private func downloadImage(from urlString: String) async -> UIImage? {
+        guard let url = URL(string: urlString) else {
+            print("Некорректный URL")
+            return nil
+        }
+        
+        do {
+            let (data, response) = try await URLSession.shared.data(from: url)
+            
+            // Проверка HTTP-статуса
+            guard let httpResponse = response as? HTTPURLResponse,
+                  (200...299).contains(httpResponse.statusCode) else {
+                print("Некорректный ответ сервера")
+                return nil
+            }
+            
+            return UIImage(data: data)
+        } catch {
+            print("Ошибка загрузки: \(error)")
+            return nil
+        }
     }
 }
 
@@ -73,8 +94,6 @@ extension WeatherViewController: CLLocationManagerDelegate {
             self.updateUI(with: location)
             
             locationManager.stopUpdatingLocation()
-            //let lat = location.coordinate.latitude
-            //let lon = location.coordinate.longitude
             weatherService.fetchCurrentWeather(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude) { [weak self] result in
                     DispatchQueue.main.async {
                         switch result {
@@ -89,12 +108,34 @@ extension WeatherViewController: CLLocationManagerDelegate {
     }
     
     private func displayWeather(_ weather: WeatherResponse) {
-        // Здесь будет логика отображения данных на UI
-        print(weather)
+        currentView.topLabel.text = weather.location.name
+        if let url = URL(string: String("https:\(weather.current.condition.icon)")) {
+            currentView.imageView.load(url: url)
+        }
+        currentView.rightLabel.text = "\(weather.current.temp_c) °C"
+        currentView.bottomLabel1.text = weather.current.condition.text
+        currentView.bottomLabel2.text = "Feels like \(weather.current.feelslike_c) °C"
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print(error)
     }
 }
+
+//MARK: - loading image
+
+extension UIImageView {
+    func load(url: URL) {
+        DispatchQueue.global().async { [weak self] in
+            if let data = try? Data(contentsOf: url) {
+                if let image = UIImage(data: data) {
+                    DispatchQueue.main.async {
+                        self?.image = image
+                    }
+                }
+            }
+        }
+    }
+}
+
 

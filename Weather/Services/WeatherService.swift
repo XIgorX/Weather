@@ -49,11 +49,28 @@ class WeatherService {
             
             do {
                 let decoder = JSONDecoder()
-//                if let string = String(data: data, encoding: .utf8) {
-//                    print(string)
-//                }
+                if let text = String(data: data, encoding: .utf8) {
+                    print(text)
+                }
                 let weatherResponse = try decoder.decode(WeatherResponse.self, from: data)
                 completion(.success(weatherResponse))
+            } catch let error as DecodingError {
+                switch error {
+                case .keyNotFound(let key, let context):
+                    print("Ключ '\(key)' не найден: \(context.debugDescription)")
+                    print("Путь:", context.codingPath)
+                case .typeMismatch(let type, let context):
+                    print("Несоответствие типа '\(type)': \(context.debugDescription)")
+                    print("Путь:", context.codingPath)
+                case .valueNotFound(let type, let context):
+                    print("Значение '\(type)' не найдено: \(context.debugDescription)")
+                    print("Путь:", context.codingPath)
+                case .dataCorrupted(let context):
+                    print("Данные повреждены: \(context.debugDescription)")
+                    print("Путь:", context.codingPath)
+                @unknown default:
+                    print("Неизвестная ошибка")
+                }
             } catch {
                 completion(.failure(.parsingError(error)))
             }
