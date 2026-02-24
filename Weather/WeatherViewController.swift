@@ -9,6 +9,11 @@ import UIKit
 import CoreLocation
 
 class WeatherViewController: UIViewController {
+    
+    private var defaultLocation = CLLocation(
+        latitude: 55.755864,  // Москва
+        longitude: 37.617698
+    )
 
     private let yOffset = 60
     private let currentViewHeight = 200
@@ -99,7 +104,7 @@ extension WeatherViewController: CLLocationManagerDelegate {
                 self?.retryLoading(location: location)
             }
             DispatchQueue.main.async {
-                self.present(self.loadingVC, animated: true, completion: nil)
+                if self.presentedViewController == nil { self.present(self.loadingVC, animated: true, completion: nil) }
             }
             
             //запрос погоды по геолокации
@@ -108,17 +113,38 @@ extension WeatherViewController: CLLocationManagerDelegate {
         }
     }
     
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print(error)
+    }
+    
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        switch manager.authorizationStatus {
+        case .denied, .restricted:
+            locationManager(manager, didUpdateLocations: [defaultLocation])
+        case .notDetermined:
+            manager.requestWhenInUseAuthorization()
+        case .authorizedAlways, .authorizedWhenInUse:
+            manager.startUpdatingLocation()
+        @unknown default:
+            locationManager(manager, didUpdateLocations: [defaultLocation])
+        }
+    }
+}
+
+//MARK: - fetching and displaying weather
+
+extension WeatherViewController {
     private func fetchCurrentWeather(location: CLLocation) {
         weatherService.fetchCurrentWeather(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude) { [weak self] result in
-                DispatchQueue.main.async {
-                    switch result {
-                    case .success(let weather):
-                        self?.loadingVC.dismiss(animated: true, completion: nil)
-                        self?.displayWeather(weather)
-                    case .failure(let error):
-                        self?.loadingVC.showError(with: error.errorDescription ?? "Не удалось загрузить данные.\nПроверьте подключение к сети.")
-                    }
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let weather):
+                    self?.loadingVC.dismiss(animated: true, completion: nil)
+                    self?.displayWeather(weather)
+                case .failure(let error):
+                    self?.loadingVC.showError(with: error.errorDescription ?? "Не удалось загрузить данные.\nПроверьте подключение к сети.")
                 }
+            }
         }
     }
     
@@ -126,7 +152,7 @@ extension WeatherViewController: CLLocationManagerDelegate {
         loadingVC.showLoading()
         fetchCurrentWeather(location: location)
     }
-    
+
     private func displayWeather(_ weather: WeatherResponse) {
         currentView.topLabel.text = weather.location.name
         if let url = URL(string: String("https:\(weather.current.condition.icon)")) {
@@ -135,10 +161,6 @@ extension WeatherViewController: CLLocationManagerDelegate {
         currentView.rightLabel.text = "\(weather.current.temp_c) °C"
         currentView.bottomLabel1.text = weather.current.condition.text
         currentView.bottomLabel2.text = "Feels like \(weather.current.feelslike_c) °C"
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print(error)
     }
 }
 
