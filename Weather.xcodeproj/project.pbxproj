@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		845AAFAF2F4CEAC800595848 /* LoadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 845AAFAE2F4CEAC800595848 /* LoadingViewController.swift */; };
 		84AE5EB52F49CE18001EC61C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84AE5EB42F49CE18001EC61C /* AppDelegate.swift */; };
 		84AE5EB72F49CE18001EC61C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84AE5EB62F49CE18001EC61C /* SceneDelegate.swift */; };
 		84AE5EB92F49CE18001EC61C /* WeatherViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84AE5EB82F49CE18001EC61C /* WeatherViewController.swift */; };
@@ -21,6 +22,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		845AAFAE2F4CEAC800595848 /* LoadingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingViewController.swift; sourceTree = "<group>"; };
 		84AE5EB12F49CE18001EC61C /* Weather.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Weather.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		84AE5EB42F49CE18001EC61C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		84AE5EB62F49CE18001EC61C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -72,6 +74,7 @@
 				84AE5EB42F49CE18001EC61C /* AppDelegate.swift */,
 				84AE5EB62F49CE18001EC61C /* SceneDelegate.swift */,
 				84AE5EB82F49CE18001EC61C /* WeatherViewController.swift */,
+				845AAFAE2F4CEAC800595848 /* LoadingViewController.swift */,
 				84AE5EBD2F49CE1A001EC61C /* Assets.xcassets */,
 				84AE5EBF2F49CE1A001EC61C /* LaunchScreen.storyboard */,
 				84AE5EC22F49CE1A001EC61C /* Info.plist */,
@@ -183,6 +186,7 @@
 				84AE5ECC2F49E4FD001EC61C /* Location.swift in Sources */,
 				84AE5EB72F49CE18001EC61C /* SceneDelegate.swift in Sources */,
 				84AE5ED12F4A091C001EC61C /* CurrentView.swift in Sources */,
+				845AAFAF2F4CEAC800595848 /* LoadingViewController.swift in Sources */,
 				84AE5ECA2F49E3E7001EC61C /* Current.swift in Sources */,
 				84AE5ED62F4B4F0A001EC61C /* WeatherService.swift in Sources */,
 			);

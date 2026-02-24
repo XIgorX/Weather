@@ -103,11 +103,6 @@ class CurrentView: UIView {
     }
     
     func changeText(newText: String) {
-        
-//        DispatchQueue.main.async {
-//                print("Обновление в главном потоке")
-                self.topLabel.text = newText
-//                print("Текст установлен: \(self.topLabel.text ?? "nil")")
-//            }
+        self.topLabel.text = newText
     }
 }

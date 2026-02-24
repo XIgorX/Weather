@@ -9,13 +9,14 @@ import UIKit
 import CoreLocation
 
 class WeatherViewController: UIViewController {
-    
+
     private let yOffset = 60
     private let currentViewHeight = 200
     private let coordinateLabelHeight = 32
     
     private var currentView = CurrentView()
     private var coordinateLabel = UILabel()
+    private var loadingVC = LoadingViewController()
     
     private let locationManager = CLLocationManager()
     private let weatherService = WeatherService()
@@ -25,7 +26,7 @@ class WeatherViewController: UIViewController {
         
         view.backgroundColor = .systemGreen
         currentView = CurrentView(frame: CGRect(x: 0, y: yOffset, width: Int(view.frame.width), height: currentViewHeight))
-//        currentView.translatesAutoresizingMaskIntoConstraints = false
+        currentView.translatesAutoresizingMaskIntoConstraints = false
 
         view.addSubview(currentView)
 
@@ -56,12 +57,6 @@ class WeatherViewController: UIViewController {
         self.coordinateLabel.text = coordinates
     }
     
-    private func showError(_ message: String) {
-        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
-    }
-    
     private func downloadImage(from urlString: String) async -> UIImage? {
         guard let url = URL(string: urlString) else {
             print("Некорректный URL")
@@ -89,22 +84,47 @@ class WeatherViewController: UIViewController {
 //MARK: - CCLocationManagerDelegate
 
 extension WeatherViewController: CLLocationManagerDelegate {
+
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
+            // получили геолокацию
             self.updateUI(with: location)
-            
             locationManager.stopUpdatingLocation()
-            weatherService.fetchCurrentWeather(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude) { [weak self] result in
-                    DispatchQueue.main.async {
-                        switch result {
-                        case .success(let weather):
-                            self?.displayWeather(weather)
-                        case .failure(let error):
-                            self?.showError(error.errorDescription ?? "Произошла ошибка")
-                        }
+            
+            // показ загрузки
+            loadingVC = LoadingViewController()
+            loadingVC.modalPresentationStyle = .overCurrentContext
+            loadingVC.modalTransitionStyle = .crossDissolve
+            loadingVC.onRetry = { [weak self] in
+                self?.retryLoading(location: location)
+            }
+            DispatchQueue.main.async {
+                self.present(self.loadingVC, animated: true, completion: nil)
+            }
+            
+            //запрос погоды по геолокации
+            fetchCurrentWeather(location: location)
+            
+        }
+    }
+    
+    private func fetchCurrentWeather(location: CLLocation) {
+        weatherService.fetchCurrentWeather(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude) { [weak self] result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let weather):
+                        self?.loadingVC.dismiss(animated: true, completion: nil)
+                        self?.displayWeather(weather)
+                    case .failure(let error):
+                        self?.loadingVC.showError(with: error.errorDescription ?? "Не удалось загрузить данные.\nПроверьте подключение к сети.")
                     }
                 }
         }
+    }
+    
+    private func retryLoading(location: CLLocation) {
+        loadingVC.showLoading()
+        fetchCurrentWeather(location: location)
     }
     
     private func displayWeather(_ weather: WeatherResponse) {
