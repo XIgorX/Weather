@@ -14,6 +14,8 @@ class WeatherViewController: UIViewController {
         latitude: 55.755864,  // Москва
         longitude: 37.617698
     )
+    private let minDistanceForUpdate: CLLocationDistance = 1000  // 1000 метров (1 км)
+    private var lastKnownLocation: CLLocation?
 
     private let yOffset = 60
     private let currentViewHeight = 200
@@ -93,23 +95,32 @@ extension WeatherViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
             // получили геолокацию
-            self.updateUI(with: location)
-            locationManager.stopUpdatingLocation()
             
-            // показ загрузки
-            loadingVC = LoadingViewController()
-            loadingVC.modalPresentationStyle = .overCurrentContext
-            loadingVC.modalTransitionStyle = .crossDissolve
-            loadingVC.onRetry = { [weak self] in
-                self?.retryLoading(location: location)
+            // 1. Проверяем точность (в метрах)
+            guard location.horizontalAccuracy <= 1000 else {
+                print("Низкая точность: \(location.horizontalAccuracy) м")
+                return
             }
-            DispatchQueue.main.async {
-                if self.presentedViewController == nil { self.present(self.loadingVC, animated: true, completion: nil) }
+                
+            // 2. Проверяем возраст локации (не старше 60 секунд)
+            let age = Date().timeIntervalSince(location.timestamp)
+            guard age < 60 else {
+                print("Старая локация: \(age) сек")
+                return
             }
             
-            //запрос погоды по геолокации
-            fetchCurrentWeather(location: location)
+            // проверяем есть ли последняя сохранённая локация
+            guard let lastLocation = lastKnownLocation else {
+                lastKnownLocation = locations.last
+                getWeatherByLocation(location: location)
+                return
+            }
             
+            let distance = location.distance(from: lastLocation)
+            if distance >= minDistanceForUpdate {
+                lastKnownLocation = location
+                getWeatherByLocation(location: location)
+            }
         }
     }
     
@@ -134,6 +145,26 @@ extension WeatherViewController: CLLocationManagerDelegate {
 //MARK: - fetching and displaying weather
 
 extension WeatherViewController {
+    
+    private func getWeatherByLocation(location: CLLocation)
+    {
+        self.updateUI(with: location)
+        
+        // показ загрузки
+        loadingVC = LoadingViewController()
+        loadingVC.modalPresentationStyle = .overCurrentContext
+        loadingVC.modalTransitionStyle = .crossDissolve
+        loadingVC.onRetry = { [weak self] in
+            self?.retryLoading(location: location)
+        }
+        DispatchQueue.main.async {
+            if self.presentedViewController == nil { self.present(self.loadingVC, animated: true, completion: nil) }
+        }
+        
+        //запрос погоды по геолокации
+        fetchCurrentWeather(location: location)
+    }
+    
     private func fetchCurrentWeather(location: CLLocation) {
         weatherService.fetchCurrentWeather(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude) { [weak self] result in
             DispatchQueue.main.async {
