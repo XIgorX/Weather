@@ -184,7 +184,7 @@ extension WeatherViewController {
         fetchCurrentWeather(location: location)
     }
 
-    private func displayWeather(_ weather: WeatherResponse) {
+    private func displayWeather(_ weather: СurrentResponse) {
         currentView.topLabel.text = weather.location.name
         if let url = URL(string: String("https:\(weather.current.condition.icon)")) {
             currentView.imageView.load(url: url)

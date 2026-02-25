@@ -10,7 +10,7 @@ import Foundation
 
 class WeatherService {
     private let apiKey = "fa8b3df74d4042b9aa7135114252304"
-    private let baseURL = "http://api.weatherapi.com/v1/current.json"
+    private let baseURL = "http://api.weatherapi.com/v1/forecast.json"
     
     private let session: URLSession
     
@@ -21,7 +21,7 @@ class WeatherService {
     func fetchCurrentWeather(
         latitude: Double,
         longitude: Double,
-        completion: @escaping (Result<WeatherResponse, WeatherError>) -> Void
+        completion: @escaping (Result<СurrentResponse, WeatherError>) -> Void
     ) {
         let urlString = "\(baseURL)?key=\(apiKey)&q=\(latitude),\(longitude)"
         
@@ -52,7 +52,7 @@ class WeatherService {
                 if let text = String(data: data, encoding: .utf8) {
                     print(text)
                 }
-                let weatherResponse = try decoder.decode(WeatherResponse.self, from: data)
+                let weatherResponse = try decoder.decode(СurrentResponse.self, from: data)
                 completion(.success(weatherResponse))
             } catch let error as DecodingError {
                 switch error {
