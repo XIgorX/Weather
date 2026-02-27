@@ -5,12 +5,6 @@
 //  Created by Админ on 21.02.2026.
 //
 
-struct Condition: Codable {
-    var text: String
-    var icon: String
-    var code: Int
-}
-
 struct Current: Codable {
     var last_updated_epoch: Int
     var last_updated: String

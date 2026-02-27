@@ -18,12 +18,12 @@ class WeatherService {
         self.session = session
     }
     
-    func fetchCurrentWeather(
+    func fetchForecast(
         latitude: Double,
         longitude: Double,
-        completion: @escaping (Result<СurrentResponse, WeatherError>) -> Void
+        completion: @escaping (Result<ForecastResponse, WeatherError>) -> Void
     ) {
-        let urlString = "\(baseURL)?key=\(apiKey)&q=\(latitude),\(longitude)"
+        let urlString = "\(baseURL)?key=\(apiKey)&q=\(latitude),\(longitude)&days=3"
         
         guard let url = URL(string: urlString) else {
             completion(.failure(.invalidURL))
@@ -52,7 +52,7 @@ class WeatherService {
                 if let text = String(data: data, encoding: .utf8) {
                     print(text)
                 }
-                let weatherResponse = try decoder.decode(СurrentResponse.self, from: data)
+                let weatherResponse = try decoder.decode(ForecastResponse.self, from: data)
                 completion(.success(weatherResponse))
             } catch let error as DecodingError {
                 switch error {

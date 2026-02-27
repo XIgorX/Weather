@@ -28,7 +28,7 @@ class CurrentView: UIView {
     
     // Настройка внешнего вида
     private func setupView() {
-        backgroundColor = .systemBlue
+        //backgroundColor = .systemBlue
         //layer.cornerRadius = 10
         
         // Верхний лейбл
@@ -36,12 +36,13 @@ class CurrentView: UIView {
         topLabel.numberOfLines = 0
         topLabel.translatesAutoresizingMaskIntoConstraints = false
         topLabel.textAlignment = .center
+        topLabel.font = UIFont.boldSystemFont(ofSize: 24.0)
 
         // Изображение слева
         imageView.image = UIImage(named: "example")
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.backgroundColor = .red
+        //imageView.backgroundColor = .red
 
         // Правый лейбл
         rightLabel.text = "Текст справа от картинки"
@@ -102,7 +103,7 @@ class CurrentView: UIView {
 
     }
     
-    func changeText(newText: String) {
-        self.topLabel.text = newText
-    }
+//    func changeText(newText: String) {
+//        self.topLabel.text = newText
+//    }
 }

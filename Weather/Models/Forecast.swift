@@ -39,7 +39,7 @@ struct Astro: Codable {
     var is_sun_up: UInt8
 }
 
-struct Hour: Codable {
+struct HourElement: Codable {
     var time_epoch: UInt32
     var time: String
     var temp_c: Float
@@ -76,14 +76,14 @@ struct Hour: Codable {
     var uv: Float
 }
 
-struct ForecastDay: Codable {
+struct ForecastDayElement: Codable {
     var date: String
     var date_epoch: UInt32
     var day: Day
     var astro: Astro
-    var hour: Hour
+    var hour: [HourElement]
 }
 
 struct Forecast: Codable {
-    var forecastday: ForecastDay
+    var forecastday: [ForecastDayElement]
 }

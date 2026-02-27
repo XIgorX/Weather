@@ -1,5 +1,5 @@
 //
-//  CurrentResponse.swift
+//  WeatherResponse.swift
 //  Weather
 //
 //  Created by Админ on 22.02.2026.
