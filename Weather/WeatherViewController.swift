@@ -105,14 +105,14 @@ class WeatherViewController: UIViewController {
         ])
 
         // Заполнение тестовыми данными
-        let sampleData: [HourlyWeather] = [
-            HourlyWeather(time: "Сейчас", icon: "//cdn.weatherapi.com/weather/64x64/night/266.png", chance: 10, temperature: 22),
-            HourlyWeather(time: "19:00", icon: "//cdn.weatherapi.com/weather/64x64/night/266.png", chance: 20, temperature: 21),
-            HourlyWeather(time: "20:00", icon: "//cdn.weatherapi.com/weather/64x64/night/266.png", chance: 40, temperature: 20),
-            // Добавьте остальные часы по необходимости
-        ]
-        
-        weatherView.configure(with: sampleData)
+//        let sampleData: [HourlyWeather] = [
+//            HourlyWeather(time: "Сейчас", icon: "//cdn.weatherapi.com/weather/64x64/night/266.png", chance: 10, temperature: 22),
+//            HourlyWeather(time: "19:00", icon: "//cdn.weatherapi.com/weather/64x64/night/266.png", chance: 20, temperature: 21),
+//            HourlyWeather(time: "20:00", icon: "//cdn.weatherapi.com/weather/64x64/night/266.png", chance: 40, temperature: 20),
+//            // Добавьте остальные часы по необходимости
+//        ]
+//        
+//        weatherView.configure(with: sampleData)
         
         // WeatherTableView (3 days)
         //weatherTableView = WeatherTableView()
@@ -273,7 +273,7 @@ extension WeatherViewController {
     
     private func displayWeather(_ weather: ForecastResponse) {
         displayCurrentWeather(location: weather.location, current: weather.current)
-        displayHourlyWeather(weather.forecast)
+        displayHourlyWeather(localTime: weather.location.localtime, forecast: weather.forecast)
         displayDailyWeather(weather.forecast)
     }
 
@@ -287,29 +287,52 @@ extension WeatherViewController {
         currentView.bottomLabel2.text = "Feels like \(current.feelslike_c) °C"
     }
     
-    private func displayHourlyWeather(_ forecast: Forecast) {
+    private func getHoursFromTimeString(_ time: String) -> String {
+        // проверяем, что в строке хотя бы 5 символов, чтобы избежать ошибки
+        if time.count >= 5 {
+            let start = time.index(time.endIndex, offsetBy: -5)
+            let end = time.index(start, offsetBy: 2) // Берем 2 символа вперед
+            
+            return String(time[start..<end])
+        } else {
+            return "--"
+        }
+    }
+    
+    private func displayHourlyWeather(localTime: String, forecast: Forecast) {
+
+        let currentHour = Int(getHoursFromTimeString(localTime)) ?? 0
         
         var data: [HourlyWeather] = []
 
-        for (dayIndex, forecastDayElement) in forecast.forecastday.enumerated() {
-            
-            for (hourIndex, hourElement) in forecastDayElement.hour.enumerated() {
+        //for (dayIndex, forecastDayElement) in forecast.forecastday.prefix(2).enumerated() {
+        
+        
+        if forecast.forecastday.count > 0
+        {
+            for hourElement in forecast.forecastday[0].hour[currentHour...] {
                 
                 // получаем время в часах
-                // проверяем, что в строке хотя бы 5 символов, чтобы избежать ошибки
                 var time = hourElement.time
-                if time.count >= 5 {
-                    let start = time.index(time.endIndex, offsetBy: -5)
-                    let end = time.index(start, offsetBy: 2) // Берем 2 символа вперед
-                    
-                    time = String(time[start..<end])
-                } else {
-                    time = "--"
-                }
+                time = getHoursFromTimeString(time)
                 
                 data.append(HourlyWeather(time: time, icon: hourElement.condition.icon, chance: max(Int(hourElement.chance_of_rain), Int(hourElement.chance_of_snow)), temperature: Int(hourElement.temp_c)))
             }
         }
+         
+        if forecast.forecastday.count > 1
+        {
+            for hourElement in forecast.forecastday[1].hour {
+                
+                // получаем время в часах
+                var time = hourElement.time
+                time = getHoursFromTimeString(time)
+                
+                data.append(HourlyWeather(time: time, icon: hourElement.condition.icon, chance: max(Int(hourElement.chance_of_rain), Int(hourElement.chance_of_snow)), temperature: Int(hourElement.temp_c)))
+            }
+        }
+            
+        //}
         
         weatherView.configure(with: data)
     }

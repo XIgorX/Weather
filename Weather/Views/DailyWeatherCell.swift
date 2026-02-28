@@ -66,7 +66,7 @@ class DailyWeatherCell: UITableViewCell {
     func configure(with weather: DailyWeather) {
         dayLabel.text = weather.day
         //weatherIcon.image = weather.icon
-        if let url = URL(string: "https:\(weather.icon ?? "")") {
+        if let url = URL(string: "https:\(weather.icon)") {
             weatherIcon.load(url: url)
         }
         temperatureRangeLabel.text = "\(weather.minTemperature)° / \(weather.maxTemperature)°"

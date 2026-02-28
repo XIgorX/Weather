@@ -96,6 +96,10 @@ class HourlyWeatherCell: UICollectionViewCell {
             chanceLabel.isHidden = false
         } else {
             chanceLabel.isHidden = true
+            chanceLabel.removeFromSuperview()
+            NSLayoutConstraint.activate([
+                iconImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            ])
         }
         
         temperatureLabel.text = "\(weather.temperature)°"
