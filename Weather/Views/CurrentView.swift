@@ -42,25 +42,27 @@ class CurrentView: UIView {
         imageView.image = UIImage(named: "example")
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        //imageView.backgroundColor = .red
-
+  
         // Правый лейбл
         rightLabel.text = "Текст справа от картинки"
         rightLabel.numberOfLines = 0
         rightLabel.translatesAutoresizingMaskIntoConstraints = false
         rightLabel.textAlignment = .center
-
+        rightLabel.font = UIFont.boldSystemFont(ofSize: 36.0)
+        
         // Нижний лейбл 1
         bottomLabel1.text = "Первый нижний текст"
         bottomLabel1.numberOfLines = 0
         bottomLabel1.translatesAutoresizingMaskIntoConstraints = false
         bottomLabel1.textAlignment = .center
+        bottomLabel1.font = UIFont.boldSystemFont(ofSize: 18.0)
 
         // Нижний лейбл 2
         bottomLabel2.text = "Второй нижний текст"
         bottomLabel2.numberOfLines = 0
         bottomLabel2.translatesAutoresizingMaskIntoConstraints = false
         bottomLabel2.textAlignment = .center
+        bottomLabel2.font = UIFont.systemFont(ofSize: 18.0)
         
         addSubview(topLabel)
         addSubview(imageView)

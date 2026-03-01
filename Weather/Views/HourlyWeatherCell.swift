@@ -52,6 +52,13 @@ class HourlyWeatherCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+//    override func prepareForReuse() {
+//        super.prepareForReuse()
+//        // Сбрасываем состояние
+//        chanceLabel.isHidden = true
+//        // Также сбросьте другие изменяемые свойства
+//    }
+    
     private func setupCell() {
         contentView.backgroundColor = UIColor.systemBackground
         contentView.layer.cornerRadius = 8
@@ -72,7 +79,7 @@ class HourlyWeatherCell: UICollectionViewCell {
             //iconImageView.heightAnchor.constraint(equalToConstant: 30),
             iconImageView.widthAnchor.constraint(equalToConstant: 30),
             
-            chanceLabel.topAnchor.constraint(equalTo: iconImageView.bottomAnchor, constant: 4),
+            chanceLabel.topAnchor.constraint(equalTo: iconImageView.bottomAnchor, constant: 0),
             chanceLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
 //            chanceLabel.heightAnchor.constraint(equalToConstant: 28),
             
@@ -85,18 +92,17 @@ class HourlyWeatherCell: UICollectionViewCell {
     
     func configure(with weather: HourlyWeather) {
         timeLabel.text = weather.time
-        ///conImageView.image = weather.icon
         if let url = URL(string: "https:\(weather.icon)") {
             iconImageView.load(url: url)
         }
         
         let chance = weather.chance
         if chance != 0 {
-            chanceLabel.text = "\(chance)%"
             chanceLabel.isHidden = false
+            chanceLabel.text = "\(chance)%"
         } else {
             chanceLabel.isHidden = true
-            chanceLabel.removeFromSuperview()
+            //chanceLabel.removeFromSuperview()
             NSLayoutConstraint.activate([
                 iconImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             ])
