@@ -14,8 +14,9 @@ class WeatherViewController: UIViewController {
         latitude: 55.755864,  // Москва
         longitude: 37.617698
     )
-    private let minDistanceForUpdate: CLLocationDistance = 1000  // 1000 метров (1 км)
     private var lastKnownLocation: CLLocation?
+    private let minDistanceForUpdate: CLLocationDistance = 1000  // 1000 метров (1 км)
+    private let showLocationPanel = false
 
     private let yOffset = 60
     private let currentViewHeight = 200
@@ -27,117 +28,151 @@ class WeatherViewController: UIViewController {
     private var weatherTableView = WeatherTableView()
     private var loadingVC = LoadingViewController()
     
+    private let scrollView = UIScrollView()
+    private let stackView = UIStackView()
+    
     private let locationManager = CLLocationManager()
     private let weatherService = WeatherService()
-    
-    // TODO: remove if don't need
-    
-    private func createColoredView(color: UIColor, height: CGFloat) -> UIView {
-        let view = UIView()
-        view.backgroundColor = color
-        view.heightAnchor.constraint(equalToConstant: height).isActive = true
-        return view
-    }
-    
-    ///
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         view.backgroundColor = .systemBackground
         
-//        let stackView = UIStackView()
-//        stackView.axis = .vertical
-//        stackView.distribution = .fillEqually  // Все View займут равное пространство
-//        stackView.alignment = .fill
-//        stackView.spacing = 12
-//
-//        // Создаём 4 View с разными размерами
-//        let views = [
-//            createColoredView(color: .systemBlue, height: 60),
-//            createColoredView(color: .systemOrange, height: 80),
-//            createColoredView(color: .systemPurple, height: 50),
-//            createColoredView(color: .systemTeal, height: 70)
-//        ]
-//
-//        // Массовое добавление
-//        views.forEach { stackView.addArrangedSubview($0) }
-//
-//        // Настройка ограничений для StackView
-//        stackView.translatesAutoresizingMaskIntoConstraints = false
-//        view.addSubview(stackView)
-
+//        coordinateLabel = UILabel(frame: CGRect(x: 0, y: yOffset, width: Int(view.frame.width), height: coordinateLabelHeight))
+//        coordinateLabel.translatesAutoresizingMaskIntoConstraints = false
+//        coordinateLabel.backgroundColor = .systemBlue
+//        coordinateLabel.textAlignment = .center
+//        
+//        view.addSubview(coordinateLabel)
+//        
 //        NSLayoutConstraint.activate([
-//            stackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 50),
-//            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
-//            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0)
+//            // Позиционирование относительно stackView или scrollView
+//            coordinateLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: CGFloat(yOffset)),
+//            coordinateLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+//            coordinateLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+//            
+//            // Фиксированная высота
+//            coordinateLabel.heightAnchor.constraint(equalToConstant: CGFloat(coordinateLabelHeight))
+//        ])
+//        
+//        currentView = CurrentView(frame: CGRect(x: 0, y: yOffset + coordinateLabelHeight, width: Int(view.frame.width), height: currentViewHeight))
+//        currentView.translatesAutoresizingMaskIntoConstraints = false
+//        
+//        view.addSubview(currentView)
+//
+//        NSLayoutConstraint.activate([
+//            currentView.topAnchor.constraint(equalTo: coordinateLabel.bottomAnchor),
+//            currentView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+//            currentView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+//            currentView.heightAnchor.constraint(equalToConstant: CGFloat(currentViewHeight)) // высота 200 pt
+//        ])
+//        
+//        // WeatherTodayTomorrowView
+//        
+//        view.addSubview(weatherView)
+//
+//        // Настройка constraints для weatherView
+//        weatherView.translatesAutoresizingMaskIntoConstraints = false
+//        NSLayoutConstraint.activate([
+//            weatherView.topAnchor.constraint(equalTo: currentView.bottomAnchor),
+//            weatherView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+//            weatherView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+//            weatherView.heightAnchor.constraint(equalToConstant: 240)
+//        ])
+//        
+//        // WeatherTableView (3 days)
+//        view.addSubview(weatherTableView)
+//
+//        // Настройка constraints для weatherTableView
+//        weatherTableView.translatesAutoresizingMaskIntoConstraints = false
+//        NSLayoutConstraint.activate([
+//            weatherTableView.topAnchor.constraint(equalTo: weatherView.bottomAnchor),
+//            weatherTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+//            weatherTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+//            weatherTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
 //        ])
         
-        currentView = CurrentView(frame: CGRect(x: 0, y: yOffset, width: Int(view.frame.width), height: currentViewHeight))
-        currentView.translatesAutoresizingMaskIntoConstraints = false
-
-        view.addSubview(currentView)
-
-        NSLayoutConstraint.activate([
-            currentView.topAnchor.constraint(equalTo: view.topAnchor, constant: 60),
-            currentView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            currentView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            currentView.heightAnchor.constraint(equalToConstant: CGFloat(currentViewHeight)) // высота 200 pt
-        ])
-        
-        coordinateLabel = UILabel(frame: CGRect(x: 0, y: yOffset + currentViewHeight, width: Int(view.frame.width), height: coordinateLabelHeight))
-        //coordinateLabel.backgroundColor = .red
-        coordinateLabel.textAlignment = .center
-        
-        view.addSubview(coordinateLabel)
-        
-        // WeatherTodayTomorrowView
-        //weatherView = WeatherTodayTomorrowView()
-        view.addSubview(weatherView)
-
-        // Настройка constraints для weatherView
-        weatherView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            weatherView.topAnchor.constraint(equalTo: coordinateLabel.bottomAnchor),
-            weatherView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            weatherView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            weatherView.heightAnchor.constraint(equalToConstant: 240)
-        ])
-
-        // Заполнение тестовыми данными
-//        let sampleData: [HourlyWeather] = [
-//            HourlyWeather(time: "Сейчас", icon: "//cdn.weatherapi.com/weather/64x64/night/266.png", chance: 10, temperature: 22),
-//            HourlyWeather(time: "19:00", icon: "//cdn.weatherapi.com/weather/64x64/night/266.png", chance: 20, temperature: 21),
-//            HourlyWeather(time: "20:00", icon: "//cdn.weatherapi.com/weather/64x64/night/266.png", chance: 40, temperature: 20),
-//            // Добавьте остальные часы по необходимости
-//        ]
-//        
-//        weatherView.configure(with: sampleData)
-        
-        // WeatherTableView (3 days)
-        //weatherTableView = WeatherTableView()
-        view.addSubview(weatherTableView)
-
-        // Настройка constraints для weatherTableView
-        weatherTableView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            weatherTableView.topAnchor.constraint(equalTo: weatherView.bottomAnchor),
-            weatherTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            weatherTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            weatherTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-
-        // Заполнение тестовыми данными на 3 дня
-//        let sampleData2: [DailyWeather] = [
-//            DailyWeather(day: "Сегодня", icon: "//cdn.weatherapi.com/weather/64x64/day/176.png", minTemperature: 18, maxTemperature: 25),
-//            DailyWeather(day: "Завтра", icon: "//cdn.weatherapi.com/weather/64x64/day/176.png", minTemperature: 17, maxTemperature: 23),
-//            DailyWeather(day: "Послезавтра", icon: "//cdn.weatherapi.com/weather/64x64/day/176.png", minTemperature: 19, maxTemperature: 27)
-//        ]
-//
-//        weatherTableView.configure(with: sampleData2)
-
-        
+        setupScrollViewAndStackView()
+        if showLocationPanel {
+            setupCoordinateLabel()
+        }
+        setupCurrentView()
+        setupWeatherView()
+        setupWeatherTableView()
         setupLocationManager()
+    }
+    
+    private func setupScrollViewAndStackView() {
+        // Настройка scrollView
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(scrollView)
+        
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+        
+        // Настройка stackView
+        stackView.axis = .vertical
+        stackView.spacing = 0
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.addSubview(stackView)
+        
+        NSLayoutConstraint.activate([
+            stackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            // Критически важно для прокрутки: высота stackView должна быть >= высоте scrollView
+            stackView.heightAnchor.constraint(greaterThanOrEqualTo: scrollView.heightAnchor)
+        ])
+    }
+
+    private func setupCoordinateLabel() {
+        coordinateLabel.translatesAutoresizingMaskIntoConstraints = false
+        coordinateLabel.backgroundColor = .systemBlue
+        coordinateLabel.textAlignment = .center
+        coordinateLabel.text = "Координаты"
+        
+        // Фиксированная высота
+        coordinateLabel.heightAnchor.constraint(equalToConstant: CGFloat(coordinateLabelHeight)).isActive = true
+        
+        // Добавляем в stackView как первый элемент
+        stackView.addArrangedSubview(coordinateLabel)
+    }
+
+    private func setupCurrentView() {
+        currentView.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Фиксированная высота 200 pt
+        currentView.heightAnchor.constraint(equalToConstant: CGFloat(currentViewHeight)).isActive = true
+        
+        // Добавляем в stackView после coordinateLabel
+        stackView.addArrangedSubview(currentView)
+    }
+
+    private func setupWeatherView() {
+        weatherView.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Фиксированная высота 240 pt
+        weatherView.heightAnchor.constraint(equalToConstant: 240).isActive = true
+        
+        // Добавляем в stackView
+        stackView.addArrangedSubview(weatherView)
+    }
+
+    private func setupWeatherTableView() {
+        weatherTableView.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Для таблицы нужно задать фиксированную высоту или динамически вычисляемую
+        weatherTableView.heightAnchor.constraint(equalToConstant: 250).isActive = true // Пример высоты
+        
+        // Добавляем в stackView последним
+        stackView.addArrangedSubview(weatherTableView)
     }
     
     private func setupLocationManager() {

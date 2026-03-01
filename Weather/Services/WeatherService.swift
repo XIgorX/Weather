@@ -50,7 +50,7 @@ class WeatherService {
             do {
                 let decoder = JSONDecoder()
                 if let text = String(data: data, encoding: .utf8) {
-                    print(text)
+                    //print(text)
                 }
                 let weatherResponse = try decoder.decode(ForecastResponse.self, from: data)
                 completion(.success(weatherResponse))

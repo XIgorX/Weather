@@ -47,7 +47,7 @@ class DailyWeatherCell: UITableViewCell {
         contentView.addSubview(temperatureRangeLabel)
         
         NSLayoutConstraint.activate([
-            // День недели (слева)
+            // День (слева)
             dayLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             dayLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             
@@ -65,7 +65,6 @@ class DailyWeatherCell: UITableViewCell {
     
     func configure(with weather: DailyWeather) {
         dayLabel.text = weather.day
-        //weatherIcon.image = weather.icon
         if let url = URL(string: "https:\(weather.icon)") {
             weatherIcon.load(url: url)
         }

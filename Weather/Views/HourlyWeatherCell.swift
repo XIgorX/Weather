@@ -11,7 +11,7 @@ class HourlyWeatherCell: UICollectionViewCell {
     
     private let timeLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 12)
+        label.font = UIFont.systemFont(ofSize: 14)
         label.textColor = .label
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -65,21 +65,21 @@ class HourlyWeatherCell: UICollectionViewCell {
         NSLayoutConstraint.activate([
             timeLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
             timeLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            timeLabel.heightAnchor.constraint(equalToConstant: 14),
+            //timeLabel.heightAnchor.constraint(equalToConstant: 14),
             
             iconImageView.topAnchor.constraint(equalTo: timeLabel.bottomAnchor, constant: 4),
             iconImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            iconImageView.heightAnchor.constraint(equalToConstant: 30),
+            //iconImageView.heightAnchor.constraint(equalToConstant: 30),
             iconImageView.widthAnchor.constraint(equalToConstant: 30),
             
             chanceLabel.topAnchor.constraint(equalTo: iconImageView.bottomAnchor, constant: 4),
             chanceLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            chanceLabel.heightAnchor.constraint(equalToConstant: 28),
+//            chanceLabel.heightAnchor.constraint(equalToConstant: 28),
             
             temperatureLabel.topAnchor.constraint(equalTo: chanceLabel.bottomAnchor, constant: 4),
             temperatureLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            temperatureLabel.heightAnchor.constraint(equalToConstant: 20),
-            temperatureLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
+            //temperatureLabel.heightAnchor.constraint(equalToConstant: 20),
+            temperatureLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0)//-8)
         ])
     }
     
