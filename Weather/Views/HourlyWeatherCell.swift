@@ -89,6 +89,12 @@ class HourlyWeatherCell: UICollectionViewCell {
         if let url = URL(string: "https:\(weather.icon)") {
             //iconImageView.load(url: url)
             iconImageView.loadImage(from: url, placeholder: UIImage(named: "placeholder"))
+            
+            print(timeLabel.frame.origin.y)
+//            timeLabel.layer.borderColor = UIColor.red.cgColor
+//            timeLabel.layer.borderWidth = 1
+//            iconImageView.layer.borderColor = UIColor.blue.cgColor
+//            iconImageView.layer.borderWidth = 1
         }
         
         let chance = weather.chance

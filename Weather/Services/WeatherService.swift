@@ -23,7 +23,7 @@ class WeatherService {
         longitude: Double,
         completion: @escaping (Result<ForecastResponse, WeatherError>) -> Void
     ) {
-        let urlString = "\(baseURL)?key=\(apiKey)&q=\(latitude),\(longitude)&days=3"
+        let urlString = "\(baseURL)?key=\(apiKey)&q=\(latitude),\(longitude)&days=3&lang=ru"
         
         guard let url = URL(string: urlString) else {
             completion(.failure(.invalidURL))

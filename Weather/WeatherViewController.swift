@@ -263,9 +263,10 @@ extension WeatherViewController {
         if let url = URL(string: String("https:\(current.condition.icon)")) {
             currentView.imageView.load(url: url)
         }
-        currentView.rightLabel.text = "\(current.temp_c) °C"
+        
+        currentView.rightLabel.text = String(format: "%.0f °C", current.temp_c)
         currentView.bottomLabel1.text = current.condition.text
-        currentView.bottomLabel2.text = "Ощущается как \(current.feelslike_c) °C"
+        currentView.bottomLabel2.text = String(format: "Ощущается как %.0f °C", current.feelslike_c)
     }
     
     private func getHoursFromTimeString(_ time: String) -> String {
@@ -285,10 +286,8 @@ extension WeatherViewController {
         let currentHour = Int(getHoursFromTimeString(localTime)) ?? 0
         
         var data: [HourlyWeather] = []
-
-        //for (dayIndex, forecastDayElement) in forecast.forecastday.prefix(2).enumerated() {
         
-        
+        //оставшиеся часы первого дня
         if forecast.forecastday.count > 0
         {
             for hourElement in forecast.forecastday[0].hour[currentHour...] {
@@ -300,7 +299,8 @@ extension WeatherViewController {
                 data.append(HourlyWeather(time: time, icon: hourElement.condition.icon, chance: max(Int(hourElement.chance_of_rain), Int(hourElement.chance_of_snow)), temperature: Int(hourElement.temp_c)))
             }
         }
-         
+        
+        //все часы второго дня
         if forecast.forecastday.count > 1
         {
             for hourElement in forecast.forecastday[1].hour {
@@ -312,8 +312,6 @@ extension WeatherViewController {
                 data.append(HourlyWeather(time: time, icon: hourElement.condition.icon, chance: max(Int(hourElement.chance_of_rain), Int(hourElement.chance_of_snow)), temperature: Int(hourElement.temp_c)))
             }
         }
-            
-        //}
         
         weatherView.configure(with: data)
     }
