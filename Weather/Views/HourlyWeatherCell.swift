@@ -52,13 +52,6 @@ class HourlyWeatherCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-//    override func prepareForReuse() {
-//        super.prepareForReuse()
-//        // Сбрасываем состояние
-//        chanceLabel.isHidden = true
-//        // Также сбросьте другие изменяемые свойства
-//    }
-    
     private func setupCell() {
         contentView.backgroundColor = UIColor.systemBackground
         contentView.layer.cornerRadius = 8
@@ -70,13 +63,13 @@ class HourlyWeatherCell: UICollectionViewCell {
         contentView.addSubview(temperatureLabel)
         
         NSLayoutConstraint.activate([
-            timeLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
+            timeLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 0),//8),
             timeLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             //timeLabel.heightAnchor.constraint(equalToConstant: 14),
             
             iconImageView.topAnchor.constraint(equalTo: timeLabel.bottomAnchor, constant: 4),
             iconImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            //iconImageView.heightAnchor.constraint(equalToConstant: 30),
+            iconImageView.heightAnchor.constraint(equalToConstant: 90),
             iconImageView.widthAnchor.constraint(equalToConstant: 30),
             
             chanceLabel.topAnchor.constraint(equalTo: iconImageView.bottomAnchor, constant: 0),
@@ -88,6 +81,7 @@ class HourlyWeatherCell: UICollectionViewCell {
             //temperatureLabel.heightAnchor.constraint(equalToConstant: 20),
             temperatureLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0)//-8)
         ])
+        
     }
     
     func configure(with weather: HourlyWeather) {

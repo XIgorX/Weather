@@ -56,7 +56,6 @@ class ImageManager {
             self.memoryCache.setImage(image, for: url.absoluteString)
             self.diskCache.saveImage(image, forKey: url.absoluteString)
             
-            
             // 6. Возвращаем результат
             DispatchQueue.main.async {
                 completion(image)
