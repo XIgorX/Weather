@@ -39,60 +39,6 @@ class WeatherViewController: UIViewController {
         
         view.backgroundColor = .systemBackground
         
-//        coordinateLabel = UILabel(frame: CGRect(x: 0, y: yOffset, width: Int(view.frame.width), height: coordinateLabelHeight))
-//        coordinateLabel.translatesAutoresizingMaskIntoConstraints = false
-//        coordinateLabel.backgroundColor = .systemBlue
-//        coordinateLabel.textAlignment = .center
-//        
-//        view.addSubview(coordinateLabel)
-//        
-//        NSLayoutConstraint.activate([
-//            // Позиционирование относительно stackView или scrollView
-//            coordinateLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: CGFloat(yOffset)),
-//            coordinateLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-//            coordinateLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-//            
-//            // Фиксированная высота
-//            coordinateLabel.heightAnchor.constraint(equalToConstant: CGFloat(coordinateLabelHeight))
-//        ])
-//        
-//        currentView = CurrentView(frame: CGRect(x: 0, y: yOffset + coordinateLabelHeight, width: Int(view.frame.width), height: currentViewHeight))
-//        currentView.translatesAutoresizingMaskIntoConstraints = false
-//        
-//        view.addSubview(currentView)
-//
-//        NSLayoutConstraint.activate([
-//            currentView.topAnchor.constraint(equalTo: coordinateLabel.bottomAnchor),
-//            currentView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-//            currentView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-//            currentView.heightAnchor.constraint(equalToConstant: CGFloat(currentViewHeight)) // высота 200 pt
-//        ])
-//        
-//        // WeatherTodayTomorrowView
-//        
-//        view.addSubview(weatherView)
-//
-//        // Настройка constraints для weatherView
-//        weatherView.translatesAutoresizingMaskIntoConstraints = false
-//        NSLayoutConstraint.activate([
-//            weatherView.topAnchor.constraint(equalTo: currentView.bottomAnchor),
-//            weatherView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-//            weatherView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-//            weatherView.heightAnchor.constraint(equalToConstant: 240)
-//        ])
-//        
-//        // WeatherTableView (3 days)
-//        view.addSubview(weatherTableView)
-//
-//        // Настройка constraints для weatherTableView
-//        weatherTableView.translatesAutoresizingMaskIntoConstraints = false
-//        NSLayoutConstraint.activate([
-//            weatherTableView.topAnchor.constraint(equalTo: weatherView.bottomAnchor),
-//            weatherTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-//            weatherTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-//            weatherTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-//        ])
-        
         setupScrollViewAndStackView()
         if showLocationPanel {
             setupCoordinateLabel()
@@ -319,7 +265,7 @@ extension WeatherViewController {
         }
         currentView.rightLabel.text = "\(current.temp_c) °C"
         currentView.bottomLabel1.text = current.condition.text
-        currentView.bottomLabel2.text = "Feels like \(current.feelslike_c) °C"
+        currentView.bottomLabel2.text = "Ощущается как \(current.feelslike_c) °C"
     }
     
     private func getHoursFromTimeString(_ time: String) -> String {

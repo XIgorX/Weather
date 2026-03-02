@@ -93,7 +93,8 @@ class HourlyWeatherCell: UICollectionViewCell {
     func configure(with weather: HourlyWeather) {
         timeLabel.text = weather.time
         if let url = URL(string: "https:\(weather.icon)") {
-            iconImageView.load(url: url)
+            //iconImageView.load(url: url)
+            iconImageView.loadImage(from: url, placeholder: UIImage(named: "placeholder"))
         }
         
         let chance = weather.chance

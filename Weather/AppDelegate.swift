@@ -16,6 +16,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         return true
     }
+    
+    func setupURLCache() {
+        let memoryCapacity = 50 * 1024 * 1024 // 50 МБ
+        let diskCapacity = 200 * 1024 * 1024 // 200 МБ
+        let urlCache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity, diskPath: "image_cache")
+        URLCache.shared = urlCache
+    }
 
     // MARK: UISceneSession Lifecycle
 
