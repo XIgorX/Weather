@@ -2,7 +2,7 @@
 //  ForecastDaysView.swift
 //  Weather
 //
-//  Created by Админ on 26.02.2026.
+//  Created by Игорь Данильченко on 26.02.2026.
 //
 
 import UIKit

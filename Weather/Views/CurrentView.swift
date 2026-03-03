@@ -2,7 +2,7 @@
 //  CurrentView.swift
 //  Weather
 //
-//  Created by Админ on 21.02.2026.
+//  Created by Игорь Данильченко on 21.02.2026.
 //
 
 import UIKit
@@ -15,6 +15,9 @@ class CurrentView: UIView {
     let bottomLabel1 = UILabel()
     let bottomLabel2 = UILabel()
     
+    private var currentWeatherData: CurrentWeather?
+    
+    // MARK: - Initialization
     // Инициализатор для программного создания
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -25,6 +28,14 @@ class CurrentView: UIView {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
+    
+    // MARK: - Public Methods
+    func configure(with data: CurrentWeather) {
+        self.currentWeatherData = data
+        reloadData()
+    }
+    
+    // MARK: - Private Methods
     
     // Настройка внешнего вида
     private func setupView() {
@@ -105,7 +116,16 @@ class CurrentView: UIView {
 
     }
     
-//    func changeText(newText: String) {
-//        self.topLabel.text = newText
-//    }
+    private func reloadData() {
+        if let currentWeatherData = currentWeatherData {
+            topLabel.text = currentWeatherData.location
+            if let url = URL(string: String("https:\(currentWeatherData.icon)")) {
+                //imageView.load(url: url)
+                imageView.loadImage(from: url, placeholder: UIImage(named: "placeholder"))
+            }
+            rightLabel.text = String(format: "%d °C", currentWeatherData.temperature)
+            bottomLabel1.text = currentWeatherData.condition
+            bottomLabel2.text = currentWeatherData.feelslike
+        }
+    }
 }

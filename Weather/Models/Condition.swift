@@ -2,7 +2,7 @@
 //  Condition.swift
 //  Weather
 //
-//  Created by Админ on 25.02.2026.
+//  Created by Игорь Данильченко on 25.02.2026.
 //
 
 struct Condition: Codable {

@@ -2,7 +2,7 @@
 //  LoadingViewController.swift
 //  Weather
 //
-//  Created by Админ on 23.02.2026.
+//  Created by Игорь Данильченко on 23.02.2026.
 //
 
 import UIKit

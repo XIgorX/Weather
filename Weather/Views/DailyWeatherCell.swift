@@ -2,7 +2,7 @@
 //  DailyWeatherCell.swift
 //  Weather
 //
-//  Created by Админ on 26.02.2026.
+//  Created by Игорь Данильченко on 26.02.2026.
 //
 
 import UIKit
@@ -66,7 +66,8 @@ class DailyWeatherCell: UITableViewCell {
     func configure(with weather: DailyWeather) {
         dayLabel.text = weather.day
         if let url = URL(string: "https:\(weather.icon)") {
-            weatherIcon.load(url: url)
+            //weatherIcon.load(url: url)
+            weatherIcon.loadImage(from: url, placeholder: UIImage(named: "placeholder"))
         }
         temperatureRangeLabel.text = "\(weather.minTemperature)° / \(weather.maxTemperature)°"
     }

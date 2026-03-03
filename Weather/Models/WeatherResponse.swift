@@ -2,7 +2,7 @@
 //  WeatherResponse.swift
 //  Weather
 //
-//  Created by Админ on 22.02.2026.
+//  Created by Игорь Данильченко on 22.02.2026.
 //
 
 struct СurrentResponse: Codable {

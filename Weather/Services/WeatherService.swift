@@ -2,7 +2,7 @@
 //  WeatherService.swift
 //  Weather
 //
-//  Created by Админ on 22.02.2026.
+//  Created by Игорь Данильченко on 22.02.2026.
 //
 
 import CoreLocation
@@ -14,68 +14,63 @@ class WeatherService {
     
     private let session: URLSession
     
+    
     init(session: URLSession = .shared) {
         self.session = session
     }
     
-    func fetchForecast(
-        latitude: Double,
-        longitude: Double,
-        completion: @escaping (Result<ForecastResponse, WeatherError>) -> Void
-    ) {
+    func fetchForecast(latitude: Double, longitude: Double) async throws -> ForecastResponse {
         let urlString = "\(baseURL)?key=\(apiKey)&q=\(latitude),\(longitude)&days=3&lang=ru"
         
         guard let url = URL(string: urlString) else {
-            completion(.failure(.invalidURL))
-            return
+            throw WeatherError.invalidURL
         }
         
-        let task = session.dataTask(with: url) { data, response, error in
-            if let error = error {
-                completion(.failure(.networkError(error)))
-                return
-            }
-            
-            guard let httpResponse = response as? HTTPURLResponse,
-                httpResponse.statusCode == 200 else {
-                completion(.failure(.invalidResponse))
-                return
-            }
-            
-            guard let data = data else {
-                completion(.failure(.noData))
-                return
-            }
-            
-            do {
-                let decoder = JSONDecoder()
-                if let text = String(data: data, encoding: .utf8) {
-                    //print(text)
-                }
-                let weatherResponse = try decoder.decode(ForecastResponse.self, from: data)
-                completion(.success(weatherResponse))
-            } catch let error as DecodingError {
-                switch error {
-                case .keyNotFound(let key, let context):
-                    print("Ключ '\(key)' не найден: \(context.debugDescription)")
-                    print("Путь:", context.codingPath)
-                case .typeMismatch(let type, let context):
-                    print("Несоответствие типа '\(type)': \(context.debugDescription)")
-                    print("Путь:", context.codingPath)
-                case .valueNotFound(let type, let context):
-                    print("Значение '\(type)' не найдено: \(context.debugDescription)")
-                    print("Путь:", context.codingPath)
-                case .dataCorrupted(let context):
-                    print("Данные повреждены: \(context.debugDescription)")
-                    print("Путь:", context.codingPath)
-                @unknown default:
-                    print("Неизвестная ошибка")
-                }
-            } catch {
-                completion(.failure(.parsingError(error)))
-            }
+        let (data, response) = try await session.data(from: url)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              httpResponse.statusCode == 200 else {
+            throw WeatherError.invalidResponse
         }
-        task.resume()
+        
+        do {
+            let decoder = JSONDecoder()
+            if let text = String(data: data, encoding: .utf8) {
+                // print(text)
+            }
+            return try decoder.decode(ForecastResponse.self, from: data)
+        } catch let decodingError as DecodingError {
+            try handleDecodingError(decodingError, data: data)
+            throw WeatherError.parsingError(decodingError)
+        } catch {
+            throw WeatherError.parsingError(error)
+        }
+    }
+    
+    private func handleDecodingError(_ error: DecodingError, data: Data) throws {
+        switch error {
+        case .keyNotFound(let key, let context):
+            print("Ключ '\(key)' не найден: \(context.debugDescription)")
+            print("Путь:", context.codingPath)
+        case .typeMismatch(let type, let context):
+            print("Несоответствие типа '\(type)': \(context.debugDescription)")
+            print("Путь:", context.codingPath)
+        case .valueNotFound(let type, let context):
+            print("Значение '\(type)' не найдено: \(context.debugDescription)")
+            print("Путь:", context.codingPath)
+        case .dataCorrupted(let context):
+            print("Данные повреждены: \(context.debugDescription)")
+            print("Путь:", context.codingPath)
+            // Дополнительная диагностика — выводим сырые данные при ошибке парсинга
+            if let dataString = String(data: data, encoding: .utf8) {
+                print("Сырые данные: \(dataString)")
+            } else {
+                print("Не удалось преобразовать данные в строку")
+            }
+        @unknown default:
+            print("Неизвестная ошибка декодирования")
+        }
     }
 }
+
 

@@ -2,7 +2,7 @@
 //  ViewController.swift
 //  Weather
 //
-//  Created by Админ on 21.02.2026.
+//  Created by Игорь Данильченко on 21.02.2026.
 //
 
 import UIKit
@@ -233,19 +233,44 @@ extension WeatherViewController {
         fetchWeather(location: location)
     }
     
+//    private func fetchWeather(location: CLLocation) {
+//        weatherService.fetchForecast(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude) { [weak self] result in
+//            DispatchQueue.main.async {
+//                switch result {
+//                case .success(let weather):
+//                    self?.loadingVC.dismiss(animated: true, completion: nil)
+//                    self?.displayWeather(weather)
+//                case .failure(let error):
+//                    self?.loadingVC.showError(with: error.errorDescription ?? "Не удалось загрузить данные.\nПроверьте подключение к сети.")
+//                }
+//            }
+//        }
+//    }
+    
     private func fetchWeather(location: CLLocation) {
-        weatherService.fetchForecast(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude) { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let weather):
-                    self?.loadingVC.dismiss(animated: true, completion: nil)
-                    self?.displayWeather(weather)
-                case .failure(let error):
-                    self?.loadingVC.showError(with: error.errorDescription ?? "Не удалось загрузить данные.\nПроверьте подключение к сети.")
+        Task { [weak self] in
+            guard let self = self else { return }
+            
+            do {
+                let weather = try await self.weatherService.fetchForecast(
+                    latitude: location.coordinate.latitude,
+                    longitude: location.coordinate.longitude
+                )
+                
+                await MainActor.run {
+                    self.loadingVC.dismiss(animated: true, completion: nil)
+                    self.displayWeather(weather)
+                }
+            } catch {
+                await MainActor.run {
+                    self.loadingVC.showError(
+                        with: error.localizedDescription 
+                    )
                 }
             }
         }
     }
+
     
     private func retryLoading(location: CLLocation) {
         loadingVC.showLoading()
@@ -259,14 +284,7 @@ extension WeatherViewController {
     }
 
     private func displayCurrentWeather(location: Location, current: Current) {
-        currentView.topLabel.text = location.name
-        if let url = URL(string: String("https:\(current.condition.icon)")) {
-            currentView.imageView.load(url: url)
-        }
-        
-        currentView.rightLabel.text = String(format: "%.0f °C", current.temp_c)
-        currentView.bottomLabel1.text = current.condition.text
-        currentView.bottomLabel2.text = String(format: "Ощущается как %.0f °C", current.feelslike_c)
+        currentView.configure(with: CurrentWeather(location: location.name, icon: current.condition.icon, temperature: Int(current.temp_c), condition: current.condition.text, feelslike: String(format: "Ощущается как %.0f °C", current.feelslike_c)))
     }
     
     private func getHoursFromTimeString(_ time: String) -> String {
@@ -328,22 +346,6 @@ extension WeatherViewController {
         weatherTableView.configure(with: data)
     }
     
-}
-
-//MARK: - loading image
-
-extension UIImageView {
-    func load(url: URL) {
-        DispatchQueue.global().async { [weak self] in
-            if let data = try? Data(contentsOf: url) {
-                if let image = UIImage(data: data) {
-                    DispatchQueue.main.async {
-                        self?.image = image
-                    }
-                }
-            }
-        }
-    }
 }
 
 

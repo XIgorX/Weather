@@ -2,7 +2,7 @@
 //  MemoryCache.swift
 //  Weather
 //
-//  Created by Админ on 02.03.2026.
+//  Created by Игорь Данильченко on 02.03.2026.
 //
 
 import UIKit

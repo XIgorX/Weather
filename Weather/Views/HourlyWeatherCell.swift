@@ -2,7 +2,7 @@
 //  HourlyWeatherCell.swift
 //  Weather
 //
-//  Created by Админ on 26.02.2026.
+//  Created by Игорь Данильченко on 26.02.2026.
 //
 
 import UIKit
@@ -74,7 +74,7 @@ class HourlyWeatherCell: UICollectionViewCell {
             
             chanceLabel.topAnchor.constraint(equalTo: iconImageView.bottomAnchor, constant: 0),
             chanceLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-//            chanceLabel.heightAnchor.constraint(equalToConstant: 28),
+            //chanceLabel.heightAnchor.constraint(equalToConstant: 28),
             
             temperatureLabel.topAnchor.constraint(equalTo: chanceLabel.bottomAnchor, constant: 4),
             temperatureLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
@@ -87,14 +87,7 @@ class HourlyWeatherCell: UICollectionViewCell {
     func configure(with weather: HourlyWeather) {
         timeLabel.text = weather.time
         if let url = URL(string: "https:\(weather.icon)") {
-            //iconImageView.load(url: url)
             iconImageView.loadImage(from: url, placeholder: UIImage(named: "placeholder"))
-            
-            print(timeLabel.frame.origin.y)
-//            timeLabel.layer.borderColor = UIColor.red.cgColor
-//            timeLabel.layer.borderWidth = 1
-//            iconImageView.layer.borderColor = UIColor.blue.cgColor
-//            iconImageView.layer.borderWidth = 1
         }
         
         let chance = weather.chance
