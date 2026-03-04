@@ -39,8 +39,6 @@ class CurrentView: UIView {
     
     // Настройка внешнего вида
     private func setupView() {
-        //backgroundColor = .systemBlue
-        //layer.cornerRadius = 10
         
         // Верхний лейбл
         topLabel.text = "Заголовок"
@@ -120,7 +118,6 @@ class CurrentView: UIView {
         if let currentWeatherData = currentWeatherData {
             topLabel.text = currentWeatherData.location
             if let url = URL(string: String("https:\(currentWeatherData.icon)")) {
-                //imageView.load(url: url)
                 imageView.loadImage(from: url, placeholder: UIImage(named: "placeholder"))
             }
             rightLabel.text = String(format: "%d °C", currentWeatherData.temperature)

@@ -7,7 +7,7 @@
 
 import UIKit
 
-class WeatherTodayTomorrowView: UIView {
+class WeatherTodayTomorrowByHoursView: UIView {
     
     // MARK: - Properties
     private let titleLabel: UILabel = {
@@ -80,7 +80,7 @@ class WeatherTodayTomorrowView: UIView {
 }
 
 // MARK: - UICollectionViewDataSource
-extension WeatherTodayTomorrowView: UICollectionViewDataSource {
+extension WeatherTodayTomorrowByHoursView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return hourlyWeatherData.count
     }
@@ -96,7 +96,7 @@ extension WeatherTodayTomorrowView: UICollectionViewDataSource {
 }
 
 // MARK: - UICollectionViewDelegateFlowLayout
-extension WeatherTodayTomorrowView: UICollectionViewDelegateFlowLayout {
+extension WeatherTodayTomorrowByHoursView: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 80, height: 160)
     }

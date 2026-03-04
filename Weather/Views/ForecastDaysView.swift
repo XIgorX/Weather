@@ -7,7 +7,7 @@
 
 import UIKit
 
-class WeatherTableView: UIView {
+class Weather3DaysTableView: UIView {
     // MARK: - Properties
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -69,7 +69,7 @@ class WeatherTableView: UIView {
 }
 
 // MARK: - UITableViewDataSource
-extension WeatherTableView: UITableViewDataSource {
+extension Weather3DaysTableView: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return min(dailyWeatherData.count, 3) // Ограничиваем до 3 дней
     }
@@ -84,7 +84,7 @@ extension WeatherTableView: UITableViewDataSource {
 }
 
 // MARK: - UITableViewDelegate
-extension WeatherTableView: UITableViewDelegate {
+extension Weather3DaysTableView: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 60
     }

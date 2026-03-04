@@ -35,9 +35,6 @@ class WeatherService {
         
         do {
             let decoder = JSONDecoder()
-            if let text = String(data: data, encoding: .utf8) {
-                // print(text)
-            }
             return try decoder.decode(ForecastResponse.self, from: data)
         } catch let decodingError as DecodingError {
             try handleDecodingError(decodingError, data: data)

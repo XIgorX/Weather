@@ -10,29 +10,42 @@ import CoreLocation
 
 class WeatherViewController: UIViewController {
     
-    private var defaultLocation = CLLocation(
-        latitude: 55.755864,  // Москва
-        longitude: 37.617698
-    )
+    private enum Constants {
+        static let defaultLocation = CLLocation(latitude: 55.755864, longitude: 37.617698)
+        static let minDistanceForUpdate: CLLocationDistance = 1000 // 1000 метров (1 км)
+        static let maxAgeForLocation: TimeInterval = 60 // секунд
+        static let minAccuracyForLocation: CLLocationAccuracy = 1000 // метров
+        
+        struct UI {
+            static let yOffset: CGFloat = 60
+            static let currentViewHeight: CGFloat = 200
+            static let coordinateLabelHeight: CGFloat = 32
+            static let weatherViewHeight: CGFloat = 240
+            static let tableViewHeight: CGFloat = 240
+        }
+    }
+    
     private var lastKnownLocation: CLLocation?
-    private let minDistanceForUpdate: CLLocationDistance = 1000  // 1000 метров (1 км)
     private let showLocationPanel = false
-
-    private let yOffset = 60
-    private let currentViewHeight = 200
-    private let coordinateLabelHeight = 32
     
     private var currentView = CurrentView()
     private var coordinateLabel = UILabel()
-    private var weatherView = WeatherTodayTomorrowView()
-    private var weatherTableView = WeatherTableView()
-    private var loadingVC = LoadingViewController()
+    private var weatherView = WeatherTodayTomorrowByHoursView()
+    private var weatherTableView = Weather3DaysTableView()
+    private lazy var loadingVC: LoadingViewController = {
+        let vc = LoadingViewController()
+        vc.modalPresentationStyle = .overCurrentContext
+        vc.modalTransitionStyle = .crossDissolve
+        return vc
+    }()
     
     private let scrollView = UIScrollView()
     private let stackView = UIStackView()
     
     private let locationManager = CLLocationManager()
     private let weatherService = WeatherService()
+    
+    private var currentWeatherTask: Task<Void, Error>?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,6 +60,10 @@ class WeatherViewController: UIViewController {
         setupWeatherView()
         setupWeatherTableView()
         setupLocationManager()
+    }
+    
+    deinit {
+        currentWeatherTask?.cancel()
     }
     
     private func setupScrollViewAndStackView() {
@@ -73,8 +90,6 @@ class WeatherViewController: UIViewController {
             stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-            // Критически важно для прокрутки: высота stackView должна быть >= высоте scrollView
-            stackView.heightAnchor.constraint(greaterThanOrEqualTo: scrollView.heightAnchor)
         ])
     }
 
@@ -85,7 +100,7 @@ class WeatherViewController: UIViewController {
         coordinateLabel.text = "Координаты"
         
         // Фиксированная высота
-        coordinateLabel.heightAnchor.constraint(equalToConstant: CGFloat(coordinateLabelHeight)).isActive = true
+        coordinateLabel.heightAnchor.constraint(equalToConstant: CGFloat(Constants.UI.coordinateLabelHeight)).isActive = true
         
         // Добавляем в stackView как первый элемент
         stackView.addArrangedSubview(coordinateLabel)
@@ -94,8 +109,8 @@ class WeatherViewController: UIViewController {
     private func setupCurrentView() {
         currentView.translatesAutoresizingMaskIntoConstraints = false
         
-        // Фиксированная высота 200 pt
-        currentView.heightAnchor.constraint(equalToConstant: CGFloat(currentViewHeight)).isActive = true
+        // Фиксированная высота currentViewHeight
+        currentView.heightAnchor.constraint(equalToConstant: CGFloat(Constants.UI.currentViewHeight)).isActive = true
         
         // Добавляем в stackView после coordinateLabel
         stackView.addArrangedSubview(currentView)
@@ -104,8 +119,8 @@ class WeatherViewController: UIViewController {
     private func setupWeatherView() {
         weatherView.translatesAutoresizingMaskIntoConstraints = false
         
-        // Фиксированная высота 240 pt
-        weatherView.heightAnchor.constraint(equalToConstant: 240).isActive = true
+        // Фиксированная высота weatherViewHeight
+        weatherView.heightAnchor.constraint(equalToConstant: Constants.UI.weatherViewHeight).isActive = true
         
         // Добавляем в stackView
         stackView.addArrangedSubview(weatherView)
@@ -115,7 +130,7 @@ class WeatherViewController: UIViewController {
         weatherTableView.translatesAutoresizingMaskIntoConstraints = false
         
         // Для таблицы нужно задать фиксированную высоту или динамически вычисляемую
-        weatherTableView.heightAnchor.constraint(equalToConstant: 250).isActive = true // Пример высоты
+        weatherTableView.heightAnchor.constraint(equalToConstant: Constants.UI.tableViewHeight).isActive = true
         
         // Добавляем в stackView последним
         stackView.addArrangedSubview(weatherTableView)
@@ -165,14 +180,14 @@ extension WeatherViewController: CLLocationManagerDelegate {
             // получили геолокацию
             
             // 1. Проверяем точность (в метрах)
-            guard location.horizontalAccuracy <= 1000 else {
+            guard location.horizontalAccuracy <= Constants.minAccuracyForLocation else {
                 print("Низкая точность: \(location.horizontalAccuracy) м")
                 return
             }
                 
             // 2. Проверяем возраст локации (не старше 60 секунд)
             let age = Date().timeIntervalSince(location.timestamp)
-            guard age < 60 else {
+            guard age < Constants.maxAgeForLocation else {
                 print("Старая локация: \(age) сек")
                 return
             }
@@ -185,10 +200,12 @@ extension WeatherViewController: CLLocationManagerDelegate {
             }
             
             let distance = location.distance(from: lastLocation)
-            if distance >= minDistanceForUpdate {
+            if distance >= Constants.minDistanceForUpdate {
                 lastKnownLocation = location
                 getWeatherByLocation(location: location)
             }
+        } else {
+            print("Нет данных о локации")
         }
     }
     
@@ -196,16 +213,33 @@ extension WeatherViewController: CLLocationManagerDelegate {
         print(error)
     }
     
+    private func showLocationPermissionAlert() {
+        let alert = UIAlertController(
+            title: "Геолокация отключена. Будет использована Москва как локация по умолчанию.",
+            message: "Для точного прогноза погоды включите доступ к геолокации в настройках.",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Настройки", style: .default) { _ in
+            if let url = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(url)
+            }
+        })
+        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
+        present(alert, animated: true)
+    }
+
+    
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         switch manager.authorizationStatus {
         case .denied, .restricted:
-            locationManager(manager, didUpdateLocations: [defaultLocation])
+            locationManager(manager, didUpdateLocations: [Constants.defaultLocation])
+            showLocationPermissionAlert()
         case .notDetermined:
             manager.requestWhenInUseAuthorization()
         case .authorizedAlways, .authorizedWhenInUse:
             manager.startUpdatingLocation()
         @unknown default:
-            locationManager(manager, didUpdateLocations: [defaultLocation])
+            locationManager(manager, didUpdateLocations: [Constants.defaultLocation])
         }
     }
 }
@@ -219,9 +253,6 @@ extension WeatherViewController {
         self.updateUI(with: location)
         
         // показ загрузки
-        loadingVC = LoadingViewController()
-        loadingVC.modalPresentationStyle = .overCurrentContext
-        loadingVC.modalTransitionStyle = .crossDissolve
         loadingVC.onRetry = { [weak self] in
             self?.retryLoading(location: location)
         }
@@ -233,22 +264,9 @@ extension WeatherViewController {
         fetchWeather(location: location)
     }
     
-//    private func fetchWeather(location: CLLocation) {
-//        weatherService.fetchForecast(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude) { [weak self] result in
-//            DispatchQueue.main.async {
-//                switch result {
-//                case .success(let weather):
-//                    self?.loadingVC.dismiss(animated: true, completion: nil)
-//                    self?.displayWeather(weather)
-//                case .failure(let error):
-//                    self?.loadingVC.showError(with: error.errorDescription ?? "Не удалось загрузить данные.\nПроверьте подключение к сети.")
-//                }
-//            }
-//        }
-//    }
-    
     private func fetchWeather(location: CLLocation) {
-        Task { [weak self] in
+        currentWeatherTask?.cancel()
+        currentWeatherTask = Task { [weak self] in
             guard let self = self else { return }
             
             do {
@@ -271,7 +289,6 @@ extension WeatherViewController {
         }
     }
 
-    
     private func retryLoading(location: CLLocation) {
         loadingVC.showLoading()
         fetchWeather(location: location)
@@ -288,49 +305,37 @@ extension WeatherViewController {
     }
     
     private func getHoursFromTimeString(_ time: String) -> String {
-        // проверяем, что в строке хотя бы 5 символов, чтобы избежать ошибки
-        if time.count >= 5 {
-            let start = time.index(time.endIndex, offsetBy: -5)
-            let end = time.index(start, offsetBy: 2) // Берем 2 символа вперед
-            
-            return String(time[start..<end])
-        } else {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm"
+        
+        guard let date = formatter.date(from: time) else {
             return "--"
         }
+        
+        formatter.dateFormat = "HH"
+        return formatter.string(from: date)
     }
+
     
     private func displayHourlyWeather(localTime: String, forecast: Forecast) {
-
         let currentHour = Int(getHoursFromTimeString(localTime)) ?? 0
-        
         var data: [HourlyWeather] = []
         
-        //оставшиеся часы первого дня
-        if forecast.forecastday.count > 0
-        {
-            for hourElement in forecast.forecastday[0].hour[currentHour...] {
-                
-                // получаем время в часах
-                var time = hourElement.time
-                time = getHoursFromTimeString(time)
-                
-                data.append(HourlyWeather(time: time, icon: hourElement.condition.icon, chance: max(Int(hourElement.chance_of_rain), Int(hourElement.chance_of_snow)), temperature: Int(hourElement.temp_c)))
+        let daysToProcess = forecast.forecastday.prefix(2)
+        
+        for (dayIndex, day) in daysToProcess.enumerated() {
+            let hoursToProcess = dayIndex == 0 ? Array(day.hour[currentHour...]) : day.hour
+            
+            for hourElement in hoursToProcess {
+                let time = getHoursFromTimeString(hourElement.time)
+                data.append(HourlyWeather(
+                    time: time,
+                    icon: hourElement.condition.icon,
+                    chance: max(Int(hourElement.chance_of_rain), Int(hourElement.chance_of_snow)),
+                    temperature: Int(hourElement.temp_c)
+                ))
             }
         }
-        
-        //все часы второго дня
-        if forecast.forecastday.count > 1
-        {
-            for hourElement in forecast.forecastday[1].hour {
-                
-                // получаем время в часах
-                var time = hourElement.time
-                time = getHoursFromTimeString(time)
-                
-                data.append(HourlyWeather(time: time, icon: hourElement.condition.icon, chance: max(Int(hourElement.chance_of_rain), Int(hourElement.chance_of_snow)), temperature: Int(hourElement.temp_c)))
-            }
-        }
-        
         weatherView.configure(with: data)
     }
     
@@ -339,7 +344,7 @@ extension WeatherViewController {
         var data: [DailyWeather] = []
         let days = ["Сегодня", "Завтра", "Послезавтра"]
         
-        for (index, forecastDayElement) in forecast.forecastday.enumerated() {
+        for (index, forecastDayElement) in forecast.forecastday.prefix(3).enumerated() {
             data.append(DailyWeather(day: days[index], icon: forecastDayElement.day.condition.icon, minTemperature: Int(forecastDayElement.day.mintemp_c), maxTemperature: Int(forecastDayElement.day.maxtemp_c)))
         }
 

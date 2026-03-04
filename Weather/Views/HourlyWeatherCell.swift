@@ -63,9 +63,8 @@ class HourlyWeatherCell: UICollectionViewCell {
         contentView.addSubview(temperatureLabel)
         
         NSLayoutConstraint.activate([
-            timeLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 0),//8),
+            timeLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 0),
             timeLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            //timeLabel.heightAnchor.constraint(equalToConstant: 14),
             
             iconImageView.topAnchor.constraint(equalTo: timeLabel.bottomAnchor, constant: 4),
             iconImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
@@ -74,12 +73,10 @@ class HourlyWeatherCell: UICollectionViewCell {
             
             chanceLabel.topAnchor.constraint(equalTo: iconImageView.bottomAnchor, constant: 0),
             chanceLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            //chanceLabel.heightAnchor.constraint(equalToConstant: 28),
             
             temperatureLabel.topAnchor.constraint(equalTo: chanceLabel.bottomAnchor, constant: 4),
             temperatureLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            //temperatureLabel.heightAnchor.constraint(equalToConstant: 20),
-            temperatureLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0)//-8)
+            temperatureLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0)
         ])
         
     }
@@ -96,7 +93,6 @@ class HourlyWeatherCell: UICollectionViewCell {
             chanceLabel.text = "\(chance)%"
         } else {
             chanceLabel.isHidden = true
-            //chanceLabel.removeFromSuperview()
             NSLayoutConstraint.activate([
                 iconImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             ])
