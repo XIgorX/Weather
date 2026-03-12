@@ -319,7 +319,7 @@ extension WeatherViewController {
     
     private func displayHourlyWeather(localTime: String, forecast: Forecast) {
         let currentHour = Int(getHoursFromTimeString(localTime)) ?? 0
-        var data: [HourlyWeather] = []
+        var data:  [[HourlyWeather]] = [[],[]]
         
         let daysToProcess = forecast.forecastday.prefix(2)
         
@@ -328,7 +328,7 @@ extension WeatherViewController {
             
             for hourElement in hoursToProcess {
                 let time = getHoursFromTimeString(hourElement.time)
-                data.append(HourlyWeather(
+                data[dayIndex].append(HourlyWeather(
                     time: time,
                     icon: hourElement.condition.icon,
                     chance: max(Int(hourElement.chance_of_rain), Int(hourElement.chance_of_snow)),

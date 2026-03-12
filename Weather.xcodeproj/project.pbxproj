@@ -31,6 +31,7 @@
 		84EBC5472F5592440075302B /* ImageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84EBC5462F5592440075302B /* ImageManager.swift */; };
 		84EBC54A2F55932D0075302B /* MemoryCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84EBC5492F55932D0075302B /* MemoryCache.swift */; };
 		84EBC54C2F5593480075302B /* DiskCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84EBC54B2F5593480075302B /* DiskCache.swift */; };
+		84EBC54E2F60C3B80075302B /* HoursSectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84EBC54D2F60C3B80075302B /* HoursSectionHeaderView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -60,6 +61,7 @@
 		84EBC5462F5592440075302B /* ImageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageManager.swift; sourceTree = "<group>"; };
 		84EBC5492F55932D0075302B /* MemoryCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryCache.swift; sourceTree = "<group>"; };
 		84EBC54B2F5593480075302B /* DiskCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskCache.swift; sourceTree = "<group>"; };
+		84EBC54D2F60C3B80075302B /* HoursSectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoursSectionHeaderView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -135,6 +137,7 @@
 			children = (
 				84AE5ED02F4A091C001EC61C /* CurrentView.swift */,
 				845AAFB22F4F534F00595848 /* ForecastHoursView.swift */,
+				84EBC54D2F60C3B80075302B /* HoursSectionHeaderView.swift */,
 				845AAFBA2F50540A00595848 /* HourlyWeatherCell.swift */,
 				845AAFC02F50817900595848 /* ForecastDaysView.swift */,
 				845AAFBE2F507E4A00595848 /* DailyWeatherCell.swift */,
@@ -233,6 +236,7 @@
 			files = (
 				845AAFBD2F507D4400595848 /* DailyWeather.swift in Sources */,
 				845AAFB32F4F534F00595848 /* ForecastHoursView.swift in Sources */,
+				84EBC54E2F60C3B80075302B /* HoursSectionHeaderView.swift in Sources */,
 				845AAFBB2F50540A00595848 /* HourlyWeatherCell.swift in Sources */,
 				84AE5ED82F4B5555001EC61C /* WeatherError.swift in Sources */,
 				84AE5EB92F49CE18001EC61C /* WeatherViewController.swift in Sources */,

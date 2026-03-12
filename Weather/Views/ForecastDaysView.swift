@@ -79,6 +79,7 @@ extension Weather3DaysTableView: UITableViewDataSource {
             return UITableViewCell()
         }
         cell.configure(with: dailyWeatherData[indexPath.row])
+        cell.backgroundColor = indexPath.item % 2 == 0 ? .systemGray6 : .white
         return cell
     }
 }

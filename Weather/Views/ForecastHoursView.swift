@@ -30,10 +30,17 @@ class WeatherTodayTomorrowByHoursView: UIView {
         collectionView.backgroundColor = .clear
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.register(HourlyWeatherCell.self, forCellWithReuseIdentifier: "HourlyWeatherCell")
+        
+        collectionView.register(
+            HoursSectionHeaderView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: HoursSectionHeaderView.reuseIdentifier
+        )
+        
         return collectionView
     }()
     
-    private var hourlyWeatherData: [HourlyWeather] = []
+    private var hourlyWeatherData: [[HourlyWeather]] = [[]]
     
     // MARK: - Initialization
     override init(frame: CGRect) {
@@ -46,7 +53,7 @@ class WeatherTodayTomorrowByHoursView: UIView {
     }
     
     // MARK: - Public Methods
-    func configure(with data: [HourlyWeather]) {
+    func configure(with data: [[HourlyWeather]]) {
         self.hourlyWeatherData = data
         collectionView.reloadData()
     }
@@ -81,8 +88,13 @@ class WeatherTodayTomorrowByHoursView: UIView {
 
 // MARK: - UICollectionViewDataSource
 extension WeatherTodayTomorrowByHoursView: UICollectionViewDataSource {
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return hourlyWeatherData.count // Количество секций
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return hourlyWeatherData.count
+        return hourlyWeatherData[section].count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -90,8 +102,29 @@ extension WeatherTodayTomorrowByHoursView: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         
-        cell.configure(with: hourlyWeatherData[indexPath.item])
+        cell.configure(with: hourlyWeatherData[indexPath.section][indexPath.item])
+        cell.contentView.backgroundColor = indexPath.item % 2 == 0 ? .systemGray6 : .white
         return cell
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        viewForSupplementaryElementOfKind kind: String,
+        at indexPath: IndexPath
+    ) -> UICollectionReusableView {
+        
+        if kind == UICollectionView.elementKindSectionHeader {
+            let headerView = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: HoursSectionHeaderView.reuseIdentifier,
+                for: indexPath
+            ) as! HoursSectionHeaderView
+            
+            headerView.configure(with: indexPath.section == 0 ? "Сегодня" : "Завтра")
+            return headerView
+        }
+        
+        fatalError("Неизвестный тип supplementary view")
     }
 }
 
@@ -103,6 +136,15 @@ extension WeatherTodayTomorrowByHoursView: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+    }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        referenceSizeForHeaderInSection section: Int
+    ) -> CGSize {
+        // Размер хэдера (ширина × высота)
+        return CGSize(width: 110, height: 160)
     }
 }
 
